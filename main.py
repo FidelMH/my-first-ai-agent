@@ -1,27 +1,14 @@
 from crewai import Crew, Agent, Task, LLM
 import discord
-from dotenv import load_dotenv
-import os
+from config import DISCORD_TOKEN, OLLAMA_MODEL, LLM_API
 
-# ----- UNE SEULE FOIS -----
-load_dotenv()  # Charge le .env dans l'environnement
-DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")
-OLLAMA_MODEL = os.getenv("OLLAMA_MODEL")
-llm_api = os.getenv("LLM_API")
-# ----- FIN DE LA CONFIGURATION -----
-# Vérification des variables d'environnement
-if not DISCORD_TOKEN:
-    raise ValueError("Le token Discord n'est pas défini dans le fichier .env")
-if not OLLAMA_MODEL:
-    raise ValueError("Le modèle OLLAMA n'est pas défini dans le fichier .env")
-if not llm_api:
-    raise ValueError("L'URL de l'API LLM n'est pas définie dans le fichier .env")
+
 
 # ----- CONFIGURATION DE CREW.AI -----
 # Assurez-vous d'avoir installé la bibliothèque crewai avec `pip install crewai`
 llm = LLM(
     model=OLLAMA_MODEL,
-    base_url=llm_api
+    base_url=LLM_API,  # Assurez-vous que l'API Ollama est en cours d'exécution
 )
 
 mon_agent = Agent(
