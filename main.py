@@ -3,11 +3,25 @@ import discord
 from dotenv import load_dotenv
 import os
 
+# ----- UNE SEULE FOIS -----
+load_dotenv()  # Charge le .env dans l'environnement
+DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")
+OLLAMA_MODEL = os.getenv("OLLAMA_MODEL")
+llm_api = os.getenv("LLM_API")
+# ----- FIN DE LA CONFIGURATION -----
+# Vérification des variables d'environnement
+if not DISCORD_TOKEN:
+    raise ValueError("Le token Discord n'est pas défini dans le fichier .env")
+if not OLLAMA_MODEL:
+    raise ValueError("Le modèle OLLAMA n'est pas défini dans le fichier .env")
+if not llm_api:
+    raise ValueError("L'URL de l'API LLM n'est pas définie dans le fichier .env")
 
-
+# ----- CONFIGURATION DE CREW.AI -----
+# Assurez-vous d'avoir installé la bibliothèque crewai avec `pip install crewai`
 llm = LLM(
-    model="ollama/mistral",
-    base_url="http://localhost:11434"
+    model=OLLAMA_MODEL,
+    base_url=llm_api
 )
 
 mon_agent = Agent(
@@ -48,13 +62,12 @@ class MyClient(discord.Client):
             await message.reply(response)
 
 if __name__ == "__main__":
-    # ----- UNE SEULE FOIS -----
-    load_dotenv()  # Charge le .env dans l'environnement
 
-    TOKEN = os.getenv("DISCORD_TOKEN")
     intents = discord.Intents.default()
     intents.messages = True
     intents.message_content = True   # <-- Essentiel !
 
     client = MyClient(intents=intents)
-    client.run(TOKEN)
+    client.run(DISCORD_TOKEN)
+
+    
