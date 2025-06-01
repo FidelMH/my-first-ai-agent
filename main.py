@@ -8,7 +8,8 @@ from bot import Bot, intents
 if __name__ == "__main__":
 
 
-
+    if not DISCORD_TOKEN:
+        raise RuntimeError("DISCORD_TOKEN manquant dans .env")
     client = Bot(intents=intents)
     client.run(DISCORD_TOKEN)
 

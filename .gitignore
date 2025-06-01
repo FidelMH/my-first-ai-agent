@@ -38,3 +38,5 @@ env/
 *.log
 .coverage
 htmlcov/
+
+*test.py

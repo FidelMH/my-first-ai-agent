@@ -1,5 +1,6 @@
 from config import  OLLAMA_MODEL, LLM_API
 from crewai import Crew, Agent, Task, LLM
+
 # ----- CONFIGURATION DE CREW.AI -----
 # Assurez-vous d'avoir installé la bibliothèque crewai avec `pip install crewai`
 llm = LLM(
@@ -23,4 +24,5 @@ question_task = Task(
 crew = Crew(
     agents=[mon_agent],
     tasks=[question_task],
+    name="gf_crew",
 )
