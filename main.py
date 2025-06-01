@@ -1,4 +1,4 @@
-
+from ai_agents_test import crew
 from config import DISCORD_TOKEN
 from bot import Bot, intents
 
@@ -10,7 +10,7 @@ if __name__ == "__main__":
 
     if not DISCORD_TOKEN:
         raise RuntimeError("DISCORD_TOKEN manquant dans .env")
-    client = Bot(intents=intents)
+    client = Bot(crew,intents=intents)
     client.run(DISCORD_TOKEN)
 
     

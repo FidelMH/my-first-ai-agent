@@ -1,5 +1,5 @@
 import discord
-from ai_agents_test import crew
+
 import asyncio
 import logging
 # ----- CONFIGURATION DU LOGGING -----
@@ -18,6 +18,9 @@ intents.message_content = True   # <-- Essentiel !
 
 
 class Bot(discord.Client):
+    def __init__(self, crew_instance, intents=intents):
+        super().__init__(intents=intents)
+        self.crew = crew_instance  # Initialisation de crew à None
     async def on_ready(self):
         print(f'Connecté en tant que {self.user}')
 
@@ -27,6 +30,10 @@ class Bot(discord.Client):
             return
         if message.content.startswith('!ai '):
             prompt = message.content[4:]
+
+            if len(prompt) > 500:
+                await message.reply("Votre question est trop longue (500 caractères max).")
+                return
             inputs = {
                 "message": prompt,
             }
@@ -34,7 +41,7 @@ class Bot(discord.Client):
             await message.channel.typing()
             # Appel asynchrone à crew.kickoff
             try:
-                response = await crew.kickoff_async(inputs=inputs)
+                response = await self.crew.kickoff_async(inputs=inputs)
             
             except TimeoutError:
                 logger.error("Timeout lors de l'appel au LLM")
