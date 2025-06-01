@@ -1,31 +1,43 @@
-# Mon Premier Agent IA avec Ollama
+# Mon Premier Agent
 
 ## Description
-Ce projet utilise Ollama pour créer un agent d'intelligence artificielle en local. Ollama permet d'exécuter des modèles de langage localement sur votre machine.
-
-## Prérequis
-- Python 3.x
-- Ollama installé localement
-- Dépendances Python (requirements.txt)
+A Python project demonstrating the implementation of a basic AI agent integrated with Discord. The agent interacts with users through a Discord bot interface.
 
 ## Installation
-1. Clonez le repository
-2. Installez les dépendances :
 ```bash
-pip install -r requirements.txt
-```
-3. Assurez-vous qu'Ollama est en cours d'exécution sur votre machine
+# Clone the repository
+git clone https://github.com/yourusername/mon_premier_agent.git
 
-## Utilisation
-```bash
+# Navigate to project directory
+cd mon_premier_agent
+
+# Install dependencies
+
+# Copy and configure environment variables
+cp .env-renameme .env
+
+# Edit .env file and set your Discord bot token
+# Replace YOUR_BOT_TOKEN_HERE with your actual Discord bot token
+# On Windows use: notepad .env
+# On Linux/Mac use: nano .env
+
+```
+
+## Usage
+```python
 python main.py
 ```
 
-## Structure du Projet
-```
-mon_premier_agent/
-├── README.md
-├── requirements.txt
-└── main.py
-```
+## Features
+- Basic AI agent implementation
+- Discord bot integration for user interaction
+- Real-time communication with the agent through Discord
+- [Add more features]
+
+## Requirements
+- Python >=3.10 and <3.13
+- discord.py
+- crewai
+
+
 
