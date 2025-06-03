@@ -24,5 +24,6 @@ question_task = Task(
 crew = Crew(
     agents=[mon_agent],
     tasks=[question_task],
-    name="gf_crew",
+    name="Assistant IA Crew",
+    verbose=True
 )

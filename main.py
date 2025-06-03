@@ -1,4 +1,4 @@
-from ai_agents_test import crew
+from ai_agents import crew
 from config import DISCORD_TOKEN
 from bot import Bot, intents
 
