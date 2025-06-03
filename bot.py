@@ -14,6 +14,7 @@ class Bot(discord.Client):
     def __init__(self, crew_instance, intents=intents):
         super().__init__(intents=intents)
         self.crew = crew_instance  # Initialisation de crew à None
+        
     async def on_ready(self):
         await on_ready_handler(self)
 

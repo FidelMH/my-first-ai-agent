@@ -1,7 +1,9 @@
+import sys
+from errors import ConfigError
+from logging_config import setup_logging, logger
 from ai_agents import crew
 from config import DISCORD_TOKEN
 from bot import Bot, intents
-from logging_config import setup_logging, logger
 
 # ----- FIN DE LA CONFIGURATION -----
 
@@ -20,6 +22,9 @@ if __name__ == "__main__":
         client = Bot(crew,intents=intents)
         client.run(DISCORD_TOKEN)
 
+    except ConfigError as ce:
+        logger.error(f"Erreur de configuration : {ce}")
+        sys.exit(1)
     except Exception as e:
         logger.exception(f"Erreur lors du démarrage du bot: {e}")
         raise RuntimeError("Erreur lors du démarrage du bot Discord") from e    
