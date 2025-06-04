@@ -1,3 +1,4 @@
 crewai
 discord
 crewai[tools]
+duckduckgo_search
