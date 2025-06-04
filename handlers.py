@@ -30,7 +30,7 @@ async def on_message_handler(bot, message) :
                 return
             
             except ConnectionError as ce:
-                logger.error("Impossible de joindre l'API LLM (ConnectionRefused) : {ce}")
+                logger.error(f"Impossible de joindre l'API LLM (ConnectionRefused) : {ce}")
                 await message.reply("Service IA indisponible, veuillez réessayer plus tard.")
                 return
             
