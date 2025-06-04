@@ -1,6 +1,6 @@
 from config import  OLLAMA_MODEL, LLM_API
 from crewai import Crew, Agent, Task, LLM
-from utils import MyCustomTool  # Assurez-vous que cet outil est défini dans utils.py
+from utils import GoogleSearchTool  # Assurez-vous que cet outil est défini dans utils.py
 
 # ----- CONFIGURATION DE CREW.AI -----
 # Assurez-vous d'avoir installé la bibliothèque crewai avec `pip install crewai`
@@ -9,7 +9,7 @@ llm = LLM(
     base_url=LLM_API,  # Assurez-vous que l'API Ollama est en cours d'exécution
 )
 
-web_search_tool = MyCustomTool()
+web_search_tool = GoogleSearchTool()
 mon_agent = Agent(
     role="Assistant IA",
     goal="Répondre aux questions factuelles avec des explications claires et concises.",

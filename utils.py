@@ -1,30 +1,22 @@
-from duckduckgo_search import DDGS
+from googleapiclient.discovery import build
 from pydantic import BaseModel, Field
 from crewai.tools import BaseTool
 from typing import Type
 
-   
+GOOGLE_API_KEY = "VOTRE_API_KEY"
+GOOGLE_CSE_ID = "VOTRE_ID_CSE"
 
-class MyToolInput(BaseModel):
-    """Input schema for MyCustomTool."""
-    argument: str = Field(..., description="Description of the argument.")
+class GoogleToolInput(BaseModel):
+    query: str = Field(..., description="Termes de recherche")
 
-class MyCustomTool(BaseTool):
-    name: str = "WebsearchTool"
-    description: str = "Search the web using DuckDuckGo."
-    args_schema: Type[BaseModel] = MyToolInput
+class GoogleSearchTool(BaseTool):
+    name: str = "GoogleWebSearch"
+    description: str = "Search the web with Google Custom Search"
+    args_schema: Type[BaseModel] = GoogleToolInput
 
-    def _run(self, argument: str) -> str:
-
-        try:
-            self.search(f"{argument}",5)
-        except Exception as e:
-            return f"An error occurred while searching: {e}"
-        return 
-    
-    def search(self, query, max_results=5):
-        with DDGS() as ddgs:
-            results = [r for r in ddgs.text(query, max_results=max_results)]
-        
-        return "\n".join([f"{r['title']} : {r['href']}" for r in results])
+    def _run(self, query: str) -> str:
+        service = build("customsearch", "v1", developerKey=GOOGLE_API_KEY)
+        res = service.cse().list(q=query, cx=GOOGLE_CSE_ID, num=5).execute()
+        results = res.get("items", [])
+        return "\n".join(f"{item['title']} : {item['snippet']}" for item in results)
 
