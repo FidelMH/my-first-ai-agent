@@ -12,6 +12,7 @@ git clone https://github.com/yourusername/mon_premier_agent.git
 cd mon_premier_agent
 
 # Install dependencies
+pip install -r requirements.txt
 
 # Copy and configure environment variables
 cp .env-renameme .env
@@ -36,6 +37,7 @@ python main.py
 
 ## Requirements
 - Python >=3.10 and <3.13
+- python-dotenv
 - discord.py
 - crewai
 
