@@ -1,6 +1,10 @@
 # tests/test_handlers.py
 import sys
-sys.path.append('../')
+import os
+# Ensure project root is on sys.path for imports
+CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT = os.path.dirname(CURRENT_DIR)
+sys.path.append(PROJECT_ROOT)
 # tests/test_handlers.py
 
 import pytest
