@@ -1,4 +1,4 @@
 crewai
-discord
+discord.py
 crewai[tools]
 duckduckgo_search
