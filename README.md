@@ -23,6 +23,14 @@ cp .env-renameme .env
 
 ```
 
+## Setup
+Configure the following environment variables in the `.env` file:
+
+- `DISCORD_TOKEN`: your Discord bot token.
+- `OLLAMA_MODEL`: the Ollama model to use.
+- `LLM_API`: base URL of your LLM API, e.g. `http://localhost:11434`.
+
+
 ## Usage
 ```python
 python main.py
