@@ -49,5 +49,20 @@ python main.py
 - discord.py
 - crewai
 
+## Testing
+Running the test suite requires the development packages listed in
+`requirements-dev.txt`, such as `pytest-asyncio`.
+Install them with:
+
+```bash
+pip install -r requirements-dev.txt
+```
+
+Then run the tests using:
+
+```bash
+pytest
+```
+
 
 
