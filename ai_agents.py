@@ -18,17 +18,17 @@ mon_agent = Agent(
 )
 agent_search = Agent(
     role="Agent de recherche",
-    goal="Effectuer des recherches sur le web pour trouver des informations pertinentes sur {question}.",
-    backstory="Je suis un agent spécialisé dans la recherche d'informations sur le web.",
+    goal="Répondre à toute question grâce à la recherche internet.",
+    backstory="Agent IA moderne, utilise DuckDuckGo pour répondre de façon fiable et gratuite.",
     tools=[web_search_tool],  # Assurez-vous que l'outil WebSearchTool est importé
     llm=llm
 )
 
 
 web_search = Task(
-    description="Effectuer une recherche sur le web pour trouver des informations pertinentes.",
+    description="Effectuer une recherche sur le web pour trouver des informations pertinentes avec ce mot clé {question}. donnes des liens et fais un résumé",
     agent=agent_search,
-    expected_output="le lien d'une image",
+    expected_output="le résultat de la recherche",
     
 )
 
