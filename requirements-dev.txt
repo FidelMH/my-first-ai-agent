@@ -4,3 +4,4 @@ pytest-asyncio==0.20.2
 flake8==6.0.0
 coverage==7.0.0
 duckduckgo_search
+discord.py

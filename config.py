@@ -16,3 +16,4 @@ if not OLLAMA_MODEL:
     raise ConfigError("Le modèle OLLAMA n'est pas défini dans le fichier .env")
 if not LLM_API:
     raise ConfigError("L'URL de l'API LLM n'est pas définie dans le fichier .env")
+

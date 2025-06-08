@@ -1,6 +1,5 @@
 import discord
 
-import asyncio
 from handlers import on_message_handler, on_ready_handler
 # ----- CONFIGURATION DU BOT DISCORD -----
 

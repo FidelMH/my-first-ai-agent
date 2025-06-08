@@ -38,6 +38,20 @@ python main.py
 - Python >=3.10 and <3.13
 - discord.py
 - crewai
+## Dependencies
+1. Install required packages:
+```bash
+pip install -r requirements.txt
+```
+# Environment Variables
 
+The following environment variables are required and must be set in the `.env` file (rename `.env-renameme` to `.env`):
 
+- `DISCORD_TOKEN` - Your Discord bot token obtained from the Discord Developer Portal
+- `OLLAMA_MODEL` - The name of the Ollama model you want to use (e.g. "llama2", "codellama", etc.)
+- `LLM_API` - The API endpoint URL for your Ollama instance (e.g. "http://localhost:11434/api/generate")
+
+Refer to the `.env-renameme` template file for the required format. Environment variables must be set before running the application.
+
+Note: It's recommended to use a virtual environment before installing dependencies.
 
