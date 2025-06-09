@@ -28,3 +28,4 @@ if __name__ == "__main__":
     except Exception as e:
         logger.exception(f"Erreur lors du démarrage du bot: {e}")
         raise RuntimeError("Erreur lors du démarrage du bot Discord") from e    
+    

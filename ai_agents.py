@@ -1,6 +1,5 @@
 from config import  OLLAMA_MODEL, LLM_API
 from crewai import Crew, Agent, Task, LLM
-from utils import MyCustomTool  # Assurez-vous que cet outil est défini dans utils.py
 
 # ----- CONFIGURATION DE CREW.AI -----
 # Assurez-vous d'avoir installé la bibliothèque crewai avec `pip install crewai`
@@ -12,7 +11,9 @@ llm = LLM(
 
 mon_agent = Agent(
     role="Assistant IA",
-    goal="Répondre aux questions factuelles avec des explications claires et concises.",
+    goal="""Tu es un assistant IA expert en histoire, science et culture générale. 
+        Ton objectif est de répondre aux questions factuelles avec des explications claires, concises et exactes. Si un sujet prête à débat ou à interprétation, mentionne-le brièvement. Ne spécule jamais et indique si une information est incertaine ou non disponible.
+        """,
     backstory="Je suis un assistant qui connaît tout sur l'histoire, la science et la culture générale.",
     llm=llm,
 )
@@ -32,3 +33,4 @@ crew = Crew(
     name="Assistant IA Crew",
     verbose=True
 )
+ 
