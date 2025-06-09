@@ -1,5 +1,6 @@
 from config import  OLLAMA_MODEL, LLM_API
 from crewai import Crew, Agent, Task, LLM
+from tools import SearchTool
 
 # ----- CONFIGURATION DE CREW.AI -----
 # Assurez-vous d'avoir installé la bibliothèque crewai avec `pip install crewai`
@@ -8,6 +9,7 @@ llm = LLM(
     base_url=LLM_API,  # Assurez-vous que l'API Ollama est en cours d'exécution
 )
 
+search_tool = SearchTool()
 
 mon_agent = Agent(
     role="Assistant IA",
@@ -18,7 +20,13 @@ mon_agent = Agent(
     llm=llm,
 )
 
-
+search_agent = Agent(
+    role="Recherche Web",
+    goal="Utiliser les outils de recherche pour trouver des informations sur Internet.",
+    backstory="Je suis un agent qui utilise des outils de recherche pour trouver des informations.",
+    llm=llm,
+    tools=[search_tool],
+)
 
 
 question_task = Task(
@@ -27,10 +35,12 @@ question_task = Task(
     expected_output="la réponse à la question"
 )
 
+
+
 crew = Crew(
-    agents=[mon_agent],
-    tasks=[question_task],
+    agents=[search_agent],
+    tasks=[search_tool],
     name="Assistant IA Crew",
     verbose=True
 )
- 
+
