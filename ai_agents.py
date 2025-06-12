@@ -9,7 +9,7 @@ from config import (
 from crewai import Crew, Agent, Process, Task, LLM
 from crewai_tools import SeleniumScrapingTool
 
-from tools import SearchTool
+from utils import SearchTool
 
 
 def create_llm(model: str, **config) -> LLM:
