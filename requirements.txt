@@ -2,3 +2,4 @@ crewai
 discord.py
 crewai[tools]
 langchain_google_community
+python-dotenv
