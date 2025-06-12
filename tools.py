@@ -1,4 +1,5 @@
-from crewai.tools import BaseTool, SeleniumScrapingTool
+from crewai.tools import BaseTool
+from crewai_tools import SeleniumScrapingTool
 from langchain_google_community import GoogleSearchAPIWrapper
 from config import GOOGLE_CSE_ID, GOOGLE_API_KEY
 from logging_config import logger

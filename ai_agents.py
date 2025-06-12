@@ -7,7 +7,7 @@ from config import (
     LLM_API,
 )
 from crewai import Crew, Agent, Process, Task, LLM
-from crewai_tools import SeleniumScrapingTool,safese
+from crewai_tools import SeleniumScrapingTool
 
 from tools import SearchTool
 
