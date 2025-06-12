@@ -1,11 +1,9 @@
-from pydantic import Field
 from crewai.tools import BaseTool
 from langchain_google_community import GoogleSearchAPIWrapper
 from config import GOOGLE_CSE_ID, GOOGLE_API_KEY
 from typing import Optional
 from logging_config import logger
 from urllib.parse import urlparse
-from typing import List, Dict, Optional
 
 # Configure tool-specific logger
 tool_logger = logger.getChild('tools')
@@ -27,7 +25,7 @@ class SearchTool(BaseTool):
         try:
             parsed = urlparse(url)
             return parsed.scheme in ['http', 'https'] and len(parsed.netloc) > 3
-        except:
+        except Exception:
             return False
 
     def _run(self, query: str) -> str:
