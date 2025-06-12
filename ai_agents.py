@@ -1,33 +1,31 @@
-from config import OLLAMA_MISTRAL, OLLAMA_QWEN3, OLLAMA_DEEPSEEK_R1, LLM_API
+from config import (
+    OLLAMA_MISTRAL,
+    OLLAMA_QWEN3,
+    OLLAMA_DEEPSEEK_R1,
+    LLM_API,
+)
 from crewai import Crew, Agent, Process, Task, LLM
 from tools import SearchTool
 from crewai_tools import SeleniumScrapingTool
 from logging_config import logger
 
 # Configure tool logger
-tool_logger = logger.getChild('tools')
+tool_logger = logger.getChild("tools")
 
 # ----- CONFIGURATION DE CREW.AI -----
-# Assurez-vous d'avoir installé la bibliothèque crewai avec `pip install crewai`
+# Assurez-vous d'avoir installé la bibliothèque crewai avec
+# `pip install crewai`
 # Modification de la configuration des LLMs
 llm_mistral = LLM(
     model=OLLAMA_MISTRAL,
     base_url=LLM_API,
-    config={
-        "messages": [],
-        "temperature": 0.7,
-        "context_length": 4096
-    }
+    config={"messages": [], "temperature": 0.7, "context_length": 4096},
 )
 
 llm_qwen3 = LLM(
     model=OLLAMA_QWEN3,
     base_url=LLM_API,
-    config={
-        "messages": [],
-        "temperature": 0.7,
-        "context_length": 4096
-    }
+    config={"messages": [], "temperature": 0.7, "context_length": 4096},
 )
 
 llm_deepseek_r1 = LLM(
@@ -47,7 +45,10 @@ redact_agent = Agent(
         3. Structurer l'information de manière logique
         4. Produire un résumé clair et concis
         5. Respecter la limite de 2000 caractères""",
-    backstory="Je suis un expert en synthèse qui transforme des informations complexes en résumés clairs",
+    backstory=(
+        "Je suis un expert en synthèse qui transforme des informations "
+        "complexes en résumés clairs"
+    ),
     llm=llm_qwen3,
     verbose=True,
 )
@@ -61,16 +62,20 @@ search_agent = Agent(
         3. Évaluer la qualité et la crédibilité des sources
         4. Sélectionner les 3 meilleures URLs
         5. Fournir un contexte pour chaque source""",
-    backstory="Je suis un expert en recherche qui sait identifier les sources les plus pertinentes",
+    backstory=(
+        "Je suis un expert en recherche qui sait identifier les sources les "
+        "plus pertinentes"
+    ),
     llm=llm_qwen3,
     tools=[search_tool],
-    verbose=True
+    verbose=True,
 )
 
 scrape_agent = Agent(
     role="Agent d'Extraction Web",
     goal="""Tu es un agent spécialisé dans l'extraction de contenu web.
-        Ta mission est d'analyser les URLs fournies et d'en extraire les informations pertinentes.
+        Ta mission est d'analyser les URLs fournies et d'en extraire les
+        informations pertinentes.
         Pour chaque page web :
         1. Extraire le contenu principal
         2. Identifier les dates, titres et informations clés
@@ -78,26 +83,32 @@ scrape_agent = Agent(
         4. Structurer les informations extraites de manière claire
         5. Vérifier la pertinence du contenu par rapport à la requête
         """,
-    backstory="""Je suis un expert en extraction de données web qui transforme 
+    backstory="""Je suis un expert en extraction de données web qui transforme
     les pages web en informations structurées et exploitables.""",
     llm=llm_deepseek_r1,
     tools=[scrape_tool],
-    verbose=True
+    verbose=True,
 )
-
 
 
 # Tâche de rédaction
 redact_tool = Task(
-    description="Analyse les résultats de recherche fournis par un autre agent et rédige une synthèse structurée, claire et factuelle.",
+    description=(
+        "Analyse les résultats de recherche fournis par un autre agent et "
+        "rédige une synthèse structurée, claire et factuelle."
+    ),
     agent=redact_agent,
-    expected_output="Une synthèse sous forme de résumé ou bullet points, avec titres si nécessaire. Mentionne les sources si elles sont présentes dans l'entrée.  limite à 2000 caractères maximum.",
+    expected_output=(
+        "Une synthèse sous forme de résumé ou bullet points, avec titres si "
+        "nécessaire. Mentionne les sources si elles sont présentes dans "
+        "l'entrée.  limite à 2000 caractères maximum."
+    ),
 )
 
 # Amélioration du logging des tâches
 search_task = Task(
     description="""Recherche pour : "{query}"
-    
+
     Exigences précises :
     1. Maximum 3 URLs pertinentes
     2. Sources de moins de 2 ans si possible
@@ -113,19 +124,19 @@ search_task = Task(
         }
     }""",
     agent=search_agent,
-    expected_output="Dict avec urls et contexte"
+    expected_output="Dict avec urls et contexte",
 )
 
 scrape_task = Task(
     description="""Analyse et extrait le contenu de la recherche précédente.
-    
+
     Instructions :
     1. Utilise l'outil de scraping pour chaque URL trouvée
     2. Extrait uniquement le contenu pertinent
     3. Structure les informations par source
     4. Fournis un résumé pour chaque page
     5. Indique la date de publication si disponible
-    
+
     Format de retour obligatoire:
     {
         "task_status": "completed",
@@ -136,68 +147,75 @@ scrape_task = Task(
         }
     }""",
     agent=scrape_agent,
-    expected_output="Dict avec contenu structuré par source"
+    expected_output="Dict avec contenu structuré par source",
 )
 
 redact_task = Task(
-    description="""Rédige un article structuré en Markdown à partir des informations extraites.
-    
+    description="""Rédige un article structuré en Markdown à partir des
+        informations extraites.
+
     Instructions :
     1. Analyse le contenu extrait et les sources fournies
     2. Rédige directement en Markdown avec cette structure :
-    
+
     # [Titre accrocheur en rapport avec le sujet]
-    
+
     ## Introduction
     [Introduction qui présente le contexte et les points clés]
-    
+
     ## [Premier thème principal]
     [Développement du premier aspect important...]
-    
+
     ## [Second thème principal]
     [Développement du second aspect important...]
-    
+
     ## Conclusion
     [Synthèse des points clés et ouverture]
-    
+
     ## Sources
     - [Titre de la source 1](url1)
     - [Titre de la source 2](url2)
     - [Titre de la source 3](url3)
-    
+
     Exigences :
     1. Texte direct sans formatage JSON/code
     2. Structure hiérarchique avec #, ##
     3. Style journalistique clair
     4. Maximum 2000 caractères
     5. Sources citées en bas avec liens
-    6. Le message doit être en Markdown, pas en JSON ou autre format, et pas de code block.
-    7. ne pas inclure les informations non disponibles ou les erreurs de scraping dans l'article.
+    6. Le message doit être en Markdown, pas en JSON ou autre format, et pas
+        de code block.
+    7. ne pas inclure les informations non disponibles ou les erreurs de
+        scraping dans l'article.
     8. ne pas inclure les penssées du modele, juste l'article final.""",
     agent=redact_agent,
     expected_output="Article en Markdown",
-    output_file="article.md"
+    output_file="article.md",
 )
 
-from crewai import Agent
 
 validation_agent = Agent(
     role="Contrôleur qualité",
-    goal="""Tu es un agent expert en validation de données. 
-    Ta mission : vérifier que le résultat d'une tâche respecte le format attendu.
-    
+    goal="""Tu es un agent expert en validation de données.
+    Ta mission : vérifier que le résultat d'une tâche respecte le format
+    attendu.
+
     Étapes :
     1. Lire la sortie d'une tâche précédente (search ou scraping)
     2. Vérifier qu'elle respecte le format obligatoire
     3. Identifier les champs manquants ou incohérents
-    4. Retourner un rapport de validation structuré : valid=True/False + erreurs éventuelles
-    5. Si valid=False, proposer une reformulation du prompt ou du traitement""",
-    backstory="Je suis un agent chargé de garantir la qualité et la conformité des résultats avant toute rédaction ou analyse.",
+    4. Retourner un rapport de validation structuré : valid=True/False +
+        erreurs éventuelles
+    5. Si valid=False, proposer une reformulation du prompt ou du
+        traitement""",
+    backstory=(
+        "Je suis un agent chargé de garantir la qualité et la conformité des "
+        "résultats avant toute rédaction ou analyse."
+    ),
     llm=llm_qwen3,
     verbose=True,
 )
 
-from crewai import Task
 
 validate_search_task = Task(
     description="""Valide le résultat de la tâche de recherche web.
@@ -231,6 +249,5 @@ crew = Crew(
     tasks=[search_task, scrape_task, redact_task],
     name="Assistant IA Crew",
     verbose=True,  # Active les logs détaillés,
-    process=Process.sequential
+    process=Process.sequential,
 )
-

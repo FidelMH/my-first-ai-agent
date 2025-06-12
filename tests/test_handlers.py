@@ -1,19 +1,18 @@
 # tests/test_handlers.py
-import sys
 import os
+import sys
+from types import SimpleNamespace
+import pytest
+
 # Ensure project root is on sys.path for imports
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = os.path.dirname(CURRENT_DIR)
 sys.path.append(PROJECT_ROOT)
-# tests/test_handlers.py
+from handlers import on_message_handler  # noqa: E402
 
-import pytest
-import asyncio
-from types import SimpleNamespace
-
-from handlers import on_message_handler
 
 # --- Doubles Discord (Bot / Message / Channel) ---
+
 
 class FakeChannel:
     """
@@ -21,6 +20,7 @@ class FakeChannel:
     - typing() pour simuler l'indicateur "typing"
     - reply() pour capturer la réponse dans last_reply
     """
+
     def __init__(self):
         self.last_reply = None
 
@@ -39,6 +39,7 @@ class FakeMessage:
     - author  : objet avec au moins .id
     - channel : instance de FakeChannel
     """
+
     def __init__(self, content, author, channel):
         self.content = content
         self.author = author
@@ -55,6 +56,7 @@ class FakeBot:
     - .user.id pour comparer avec message.author
     - .crew.kickoff_async() représentant l'appel à l'IA
     """
+
     def __init__(self, crew, user_id=12345):
         self.crew = crew
         self.user = SimpleNamespace(id=user_id)
@@ -62,11 +64,13 @@ class FakeBot:
 
 # --- Fixtures créant différents comportements de kickoff_async ---
 
+
 @pytest.fixture
 def fake_crew_raw():
     """
     kickoff_async renvoie un objet possédant .raw
     """
+
     class RawResponse:
         def __init__(self, text):
             self.raw = text
@@ -84,6 +88,7 @@ def fake_crew_timeout_error():
     """
     kickoff_async lève TimeoutError
     """
+
     class Crew:
         async def kickoff_async(self, inputs):
             raise TimeoutError("Le service a mis trop de temps à répondre")
@@ -96,6 +101,7 @@ def fake_crew_connection_error():
     """
     kickoff_async lève ConnectionError
     """
+
     class Crew:
         async def kickoff_async(self, inputs):
             raise ConnectionError("Impossible de joindre l'API LLM")
@@ -108,6 +114,7 @@ def fake_crew_generic_exception():
     """
     kickoff_async lève une autre Exception imprévue
     """
+
     class Crew:
         async def kickoff_async(self, inputs):
             raise RuntimeError("Erreur inattendue")
@@ -117,12 +124,11 @@ def fake_crew_generic_exception():
 
 # --- Tests unitaires ---
 
+
 @pytest.mark.asyncio
 async def test_ignore_message_from_bot(fake_crew_raw):
-    """
-    Si message.author == bot.user, on ne fait rien : kickoff_async n'est pas appelé
-    et channel.last_reply reste None.
-    """
+    """Si message.author == bot.user, on ne fait rien.
+    kickoff_async n'est pas appelé et channel.last_reply reste None."""
     bot = FakeBot(fake_crew_raw, user_id=1)
     author = SimpleNamespace(id=1)  # même ID que bot.user.id
     channel = FakeChannel()
@@ -131,6 +137,7 @@ async def test_ignore_message_from_bot(fake_crew_raw):
     # On remplace kickoff_async par un stub qui lève si jamais appelé
     async def fake_kickoff(inputs):
         raise AssertionError("kickoff_async ne doit pas être appelé")
+
     bot.crew.kickoff_async = fake_kickoff
 
     await on_message_handler(bot, message)
@@ -145,11 +152,14 @@ async def test_ignore_non_ai_prefix(fake_crew_raw):
     bot = FakeBot(fake_crew_raw)
     author = SimpleNamespace(id=2)
     channel = FakeChannel()
-    message = FakeMessage("Bonjour tout le monde", author=author, channel=channel)
+    message = FakeMessage(
+        "Bonjour tout le monde", author=author, channel=channel
+    )
 
     # Même stub pour kickoff_async
     async def fake_kickoff(inputs):
         raise AssertionError("kickoff_async ne doit pas être appelé")
+
     bot.crew.kickoff_async = fake_kickoff
 
     await on_message_handler(bot, message)
@@ -158,10 +168,9 @@ async def test_ignore_non_ai_prefix(fake_crew_raw):
 
 @pytest.mark.asyncio
 async def test_prompt_too_long(fake_crew_raw):
-    """
-    Si prompt > 500 caractères (par ex. 501 'a'), on renvoie 
-    'Votre question est trop longue (500 caractères max).' et on n'appelle pas kickoff_async.
-    """
+    """Si prompt > 500 caractères (501 'a'), on renvoie
+    'Votre question est trop longue (500 caractères max).' et on n'appelle pas
+    kickoff_async."""
     long_prompt = "a" * 501
     bot = FakeBot(fake_crew_raw)
     author = SimpleNamespace(id=3)
@@ -169,11 +178,17 @@ async def test_prompt_too_long(fake_crew_raw):
     message = FakeMessage(f"!ai {long_prompt}", author=author, channel=channel)
 
     async def fake_kickoff(inputs):
-        raise AssertionError("kickoff_async ne doit pas être appelé pour un prompt trop long")
+        raise AssertionError(
+            "kickoff_async ne doit pas être appelé pour un prompt trop long"
+        )
+
     bot.crew.kickoff_async = fake_kickoff
 
     await on_message_handler(bot, message)
-    assert channel.last_reply == "Votre question est trop longue (500 caractères max)."
+    assert (
+        channel.last_reply
+        == "Votre question est trop longue (500 caractères max)."
+    )
 
 
 @pytest.mark.asyncio
@@ -205,7 +220,10 @@ async def test_timeout_error_from_kickoff(fake_crew_timeout_error):
     message = FakeMessage("!ai test timeout", author=author, channel=channel)
 
     await on_message_handler(bot, message)
-    assert channel.last_reply == "Une erreur s'est produite lors de l'appel à l'IA."
+    assert (
+        channel.last_reply
+        == "Une erreur s'est produite lors de l'appel à l'IA."
+    )
 
 
 @pytest.mark.asyncio
@@ -217,10 +235,15 @@ async def test_connection_error_from_kickoff(fake_crew_connection_error):
     bot = FakeBot(fake_crew_connection_error)
     author = SimpleNamespace(id=6)
     channel = FakeChannel()
-    message = FakeMessage("!ai test connection", author=author, channel=channel)
+    message = FakeMessage(
+        "!ai test connection", author=author, channel=channel
+    )
 
     await on_message_handler(bot, message)
-    assert channel.last_reply == "Service IA indisponible, veuillez réessayer plus tard."
+    assert (
+        channel.last_reply
+        == "Service IA indisponible, veuillez réessayer plus tard."
+    )
 
 
 @pytest.mark.asyncio

@@ -1,6 +1,8 @@
 import sys
 from errors import ConfigError
-from logging_config import logger  # Remove setup_logging import, just import logger
+
+# Remove setup_logging import, just import logger
+from logging_config import logger
 from ai_agents import crew
 from config import DISCORD_TOKEN
 from bot import Bot, intents
@@ -13,7 +15,7 @@ if __name__ == "__main__":
     if not DISCORD_TOKEN:
         logger.error("DISCORD_TOKEN manquant dans .env. Arrêt du programme.")
         raise RuntimeError("DISCORD_TOKEN manquant dans .env")
-    
+
     logger.info("Démarrage du bot Discord...")
     try:
         client = Bot(crew, intents=intents)

@@ -3,24 +3,26 @@ import sys
 from logging.handlers import RotatingFileHandler
 
 # ----- CONFIGURATION DU LOGGING -----
+
+
 def setup_logging():
     """
     Configure le logging pour le bot Discord.
-    Les messages de log seront écrits dans un fichier et affichés dans la console.
+    Les messages de log seront écrits dans un fichier et affichés dans la
+    console.
     """
     # Création du logger
     logger = logging.getLogger(__name__)
     logger.setLevel(logging.DEBUG)
 
     # Formatage des logs
-    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    formatter = logging.Formatter(
+        "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    )
 
     # Handler pour fichier
     file_handler = RotatingFileHandler(
-        'bot.log',
-        maxBytes=1024 * 1024,  # 1MB
-        backupCount=5,
-        encoding='utf-8'
+        "bot.log", maxBytes=1024 * 1024, backupCount=5, encoding="utf-8"  # 1MB
     )
     file_handler.setLevel(logging.DEBUG)
     file_handler.setFormatter(formatter)
@@ -38,6 +40,7 @@ def setup_logging():
     logger.propagate = False
 
     return logger
+
 
 # Création d'une instance du logger
 logger = setup_logging()
