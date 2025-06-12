@@ -32,10 +32,14 @@ async def send_long_message(message, content):
 
         if current_chunk:
             chunks.append(current_chunk)
+        handler_logger.info(
+            f"Message trop long, envoi en {len(chunks)} parties."
+        )
 
         # Send chunks with indicators
         for i, chunk in enumerate(chunks, 1):
             header = f"Part {i}/{len(chunks)}:\n"
+            handler_logger.info(f"Envoi de la partie {i}/{len(chunks)}")
             await message.reply(f"{header}{chunk}")
     except Exception as e:
         handler_logger.error(f"Erreur lors de l'envoi du message : {e}", exc_info=True)
@@ -43,27 +47,37 @@ async def send_long_message(message, content):
 
 async def on_message_handler(bot, message):
     handler_logger.info(f"Message reçu de {message.author}: {message.content}")
-    if message.author == bot.user or not message.content.startswith("!ai "):
+    if message.author == bot.user:
+        handler_logger.info("Message ignoré car envoyé par le bot lui-même")
+        return
+    if not message.content.startswith("!ai "):
+        handler_logger.info("Message ignoré: préfixe '!ai ' manquant")
         return
 
     prompt = message.content[4:].strip()
     if not prompt:
+        handler_logger.warning("Prompt vide reçu")
         await message.reply("Votre question est vide.")
         return
 
     if len(prompt) > MAX_PROMPT_LENGTH:
+        handler_logger.warning(
+            "Prompt trop long: %s caractères (max %s)",
+            len(prompt),
+            MAX_PROMPT_LENGTH,
+        )
         await message.reply(
             "Votre question est trop longue (500 caractères max)."
         )
         return
 
     inputs = {"query": prompt}
-    handler_logger.debug("Prompt envoyé à l'IA")
+    handler_logger.info("Envoi du prompt au LLM")
     await message.channel.typing()
 
     try:
         response = await bot.crew.kickoff_async(inputs=inputs)
-        handler_logger.debug("Réponse de l'IA reçue")
+        handler_logger.info("Réponse du LLM reçue")
 
     except asyncio.TimeoutError as te:
         handler_logger.error(
