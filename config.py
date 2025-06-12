@@ -17,15 +17,27 @@ GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 if not DISCORD_TOKEN:
     raise ConfigError("Le token Discord n'est pas défini dans le fichier .env")
 if not OLLAMA_MISTRAL:
-    raise ConfigError("Le modèle OLLAMA_MISTRAL n'est pas défini dans le fichier .env")
+    raise ConfigError(
+        "Le modèle OLLAMA_MISTRAL n'est pas défini dans le fichier .env"
+    )
 if not OLLAMA_QWEN3:
-    raise ConfigError("Le modèle OLLAMA_QWEN3 n'est pas défini dans le fichier .env")
+    raise ConfigError(
+        "Le modèle OLLAMA_QWEN3 n'est pas défini dans le fichier .env"
+    )
 if not OLLAMA_DEEPSEEK_R1:
-    raise ConfigError("Le modèle OLLAMA_DEEPSEEK_R1 n'est pas défini dans le fichier .env")
+    raise ConfigError(
+        "Le modèle OLLAMA_DEEPSEEK_R1 n'est pas défini dans le fichier .env"
+    )
 if not LLM_API:
-    raise ConfigError("L'URL de l'API LLM n'est pas définie dans le fichier .env")
+    raise ConfigError(
+        "L'URL de l'API LLM n'est pas définie dans le fichier .env"
+    )
 if not GOOGLE_CSE_ID:
-    raise ConfigError("L'ID de la recherche personnalisée Google n'est pas défini dans le fichier .env")
+    raise ConfigError(
+        "L'ID de la recherche personnalisée Google n'est pas défini dans le "
+        "fichier .env"
+    )
 if not GOOGLE_API_KEY:
-    raise ConfigError("La clé API Google n'est pas définie dans le fichier .env")
-
+    raise ConfigError(
+        "La clé API Google n'est pas définie dans le fichier .env"
+    )
