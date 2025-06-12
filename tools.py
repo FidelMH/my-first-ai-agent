@@ -28,6 +28,7 @@ class SearchTool(BaseTool):
             return (
                 parsed.scheme in ["http", "https"] and len(parsed.netloc) > 3
             )
+
         except Exception:
             return False
 
