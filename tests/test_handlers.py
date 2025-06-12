@@ -8,7 +8,6 @@ sys.path.append(PROJECT_ROOT)
 # tests/test_handlers.py
 
 import pytest
-import asyncio
 from types import SimpleNamespace
 
 from handlers import on_message_handler
