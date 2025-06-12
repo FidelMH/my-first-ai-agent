@@ -10,7 +10,7 @@ intents.message_content = True   # <-- Essentiel !
 
 
 class Bot(discord.Client):
-    def __init__(self, crew_instance, intents=intents):
+    def __init__(self, crew_instance, intents=intents,):
         super().__init__(intents=intents)
         self.crew = crew_instance  # Initialisation de crew à None
         

@@ -6,7 +6,9 @@ from errors import ConfigError
 # ----- UNE SEULE FOIS -----
 load_dotenv()  # Charge le .env dans l'environnement
 DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")
-OLLAMA_MODEL = os.getenv("OLLAMA_MODEL")
+OLLAMA_MISTRAL = os.getenv("OLLAMA_MISTRAL")
+OLLAMA_QWEN3 = os.getenv("OLLAMA_QWEN3")
+OLLAMA_DEEPSEEK_R1 = os.getenv("OLLAMA_DEEPSEEK_R1")
 LLM_API = os.getenv("LLM_API")
 GOOGLE_CSE_ID = os.getenv("GOOGLE_CSE_ID")
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
@@ -14,8 +16,12 @@ GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 # Vérification des variables d'environnement
 if not DISCORD_TOKEN:
     raise ConfigError("Le token Discord n'est pas défini dans le fichier .env")
-if not OLLAMA_MODEL:
-    raise ConfigError("Le modèle OLLAMA n'est pas défini dans le fichier .env")
+if not OLLAMA_MISTRAL:
+    raise ConfigError("Le modèle OLLAMA_MISTRAL n'est pas défini dans le fichier .env")
+if not OLLAMA_QWEN3:
+    raise ConfigError("Le modèle OLLAMA_QWEN3 n'est pas défini dans le fichier .env")
+if not OLLAMA_DEEPSEEK_R1:
+    raise ConfigError("Le modèle OLLAMA_DEEPSEEK_R1 n'est pas défini dans le fichier .env")
 if not LLM_API:
     raise ConfigError("L'URL de l'API LLM n'est pas définie dans le fichier .env")
 if not GOOGLE_CSE_ID:
