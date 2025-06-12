@@ -1,4 +1,5 @@
 crewai
 discord.py
 crewai[tools]
-duckduckgo_search
+langchain_google_community
+python-dotenv

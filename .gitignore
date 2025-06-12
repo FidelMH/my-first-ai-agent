@@ -40,3 +40,7 @@ env/
 htmlcov/
 
 *test.py
+
+# Generated files
+report.md
+article.md
