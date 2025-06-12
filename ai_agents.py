@@ -9,7 +9,7 @@ from config import (
 from crewai import Crew, Agent, Process, Task, LLM
 from crewai_tools import SeleniumScrapingTool
 
-from tools import SearchTool
+from tools import SearchTool, SafeSeleniumScrapingTool
 
 
 def create_llm(model: str, **config) -> LLM:
@@ -30,7 +30,7 @@ def create_agents() -> tuple[Agent, Agent, Agent]:
     llm_deepseek_r1 = LLM(model=OLLAMA_DEEPSEEK_R1, base_url=LLM_API)
 
     search_tool = SearchTool()
-    scrape_tool = SeleniumScrapingTool()
+    scrape_tool = SafeSeleniumScrapingTool()
 
     redact_agent = Agent(
         role="Rédacteur de Synthèse",

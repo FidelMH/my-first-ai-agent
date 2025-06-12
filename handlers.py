@@ -13,30 +13,32 @@ async def on_ready_handler(bot):
 
 async def send_long_message(message, content):
     """Split and send long messages respecting Discord's 2000 char limit."""
-    if len(content) <= 2000:
-        await message.reply(content)
-        return
+    try:
+        if len(content) <= 2000:
+            await message.reply(content)
+            return
+        # Split content into chunks of max 2000 chars
+        chunks = []
+        current_chunk = ""
 
-    # Split content into chunks of max 2000 chars
-    chunks = []
-    current_chunk = ""
+        for line in content.split("\n"):
+            if (
+                len(current_chunk) + len(line) + 1 <= 1900
+            ):  # Leave room for chunk indicators
+                current_chunk += line + "\n"
+            else:
+                chunks.append(current_chunk)
+                current_chunk = line + "\n"
 
-    for line in content.split("\n"):
-        if (
-            len(current_chunk) + len(line) + 1 <= 1900
-        ):  # Leave room for chunk indicators
-            current_chunk += line + "\n"
-        else:
+        if current_chunk:
             chunks.append(current_chunk)
-            current_chunk = line + "\n"
 
-    if current_chunk:
-        chunks.append(current_chunk)
-
-    # Send chunks with indicators
-    for i, chunk in enumerate(chunks, 1):
-        header = f"Part {i}/{len(chunks)}:\n"
-        await message.reply(f"{header}{chunk}")
+        # Send chunks with indicators
+        for i, chunk in enumerate(chunks, 1):
+            header = f"Part {i}/{len(chunks)}:\n"
+            await message.reply(f"{header}{chunk}")
+    except Exception as e:
+        handler_logger.error(f"Erreur lors de l'envoi du message : {e}", exc_info=True)
 
 
 async def on_message_handler(bot, message):
@@ -56,12 +58,12 @@ async def on_message_handler(bot, message):
         return
 
     inputs = {"query": prompt}
-    handler_logger.debug(f"Prompt envoyé à l'IA: {prompt}")
+    handler_logger.debug("Prompt envoyé à l'IA")
     await message.channel.typing()
 
     try:
         response = await bot.crew.kickoff_async(inputs=inputs)
-        handler_logger.debug(f"Réponse de l'IA: {response.raw}")
+        handler_logger.debug("Réponse de l'IA reçue")
 
     except asyncio.TimeoutError as te:
         handler_logger.error(

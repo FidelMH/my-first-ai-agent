@@ -1,4 +1,4 @@
-from crewai.tools import BaseTool
+from crewai.tools import BaseTool, SeleniumScrapingTool
 from langchain_google_community import GoogleSearchAPIWrapper
 from config import GOOGLE_CSE_ID, GOOGLE_API_KEY
 from logging_config import logger
@@ -69,4 +69,16 @@ class SearchTool(BaseTool):
             tool_logger.error(
                 f"Erreur lors de la recherche : {e}", exc_info=True
             )
-            return f"Une erreur s'est produite lors de la recherche : {str(e)}"
+            return "Une erreur s'est produite lors de la recherche."
+
+
+class SafeSeleniumScrapingTool(SeleniumScrapingTool):
+    """SeleniumScrapingTool avec gestion d'erreurs renforcée."""
+
+    def _run(self, url: str) -> str:
+        try:
+            tool_logger.info(f"Scraping de {url}")
+            return super()._run(url)
+        except Exception as e:
+            tool_logger.error(f"Erreur lors du scraping de {url}: {e}", exc_info=True)
+            return ""

@@ -4,7 +4,10 @@ import os
 from errors import ConfigError
 
 # ----- UNE SEULE FOIS -----
-load_dotenv()  # Charge le .env dans l'environnement
+try:
+    load_dotenv()
+except Exception as e:
+    raise ConfigError(f"Impossible de charger le fichier .env : {e}")
 DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")
 OLLAMA_MISTRAL = os.getenv("OLLAMA_MISTRAL")
 OLLAMA_QWEN3 = os.getenv("OLLAMA_QWEN3")
