@@ -1,6 +1,5 @@
 from config import  OLLAMA_MODEL, LLM_API
 from crewai import Crew, Agent, Task, LLM
-from utils import MyCustomTool  # Assurez-vous que cet outil est défini dans utils.py
 
 # ----- CONFIGURATION DE CREW.AI -----
 # Assurez-vous d'avoir installé la bibliothèque crewai avec `pip install crewai`
@@ -8,7 +7,6 @@ llm = LLM(
     model=OLLAMA_MODEL,
     base_url=LLM_API,  # Assurez-vous que l'API Ollama est en cours d'exécution
 )
-
 
 mon_agent = Agent(
     role="Assistant IA",
