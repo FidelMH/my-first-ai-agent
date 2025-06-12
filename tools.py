@@ -5,6 +5,8 @@ from logging_config import logger
 from urllib.parse import urlparse
 from typing import Optional
 
+from validators import validate_search_results, validate_scrape_content
+
 # Configure tool-specific logger
 tool_logger = logger.getChild("tools")
 
@@ -42,16 +44,16 @@ class SearchTool(BaseTool):
             if not results:
                 return "Aucun résultat trouvé pour cette recherche."
 
-            valid_results = []
+            filtered = []
             for result in results:
                 title = result.get("title", "").strip()
                 snippet = result.get("snippet", "").strip()
                 link = result.get("link", "").strip()
 
                 if self.validate_url(link):
-                    valid_results.append(
-                        {"title": title, "description": snippet, "url": link}
-                    )
+                    filtered.append({"title": title, "description": snippet, "url": link})
+
+            valid_results = validate_search_results(filtered)
 
             if not valid_results:
                 return "Aucun résultat valide trouvé."
@@ -78,7 +80,10 @@ class SafeSeleniumScrapingTool(SeleniumScrapingTool):
     def _run(self, url: str) -> str:
         try:
             tool_logger.info(f"Scraping de {url}")
-            return super()._run(url)
+            result = super()._run(url)
+            if not validate_scrape_content(result):
+                return ""
+            return result
         except Exception as e:
             tool_logger.error(f"Erreur lors du scraping de {url}: {e}", exc_info=True)
             return ""
