@@ -1,3 +1,28 @@
+# AI Agents Project
+
+## Project Status Update - 2025-06-13
+
+This project was initially started to learn about AI agents creation using CrewAI. However, due to various challenges and complexities encountered with CrewAI, I've decided to pivot to a simpler, more fundamental approach.
+
+### Why the Change?
+- CrewAI, while powerful, introduced more complexity than necessary for learning
+- Debugging and understanding the system became increasingly difficult
+- The abstraction layer added unnecessary complexity
+
+### New Direction
+I'll be rebuilding this project using more low-level tools:
+- Direct integration with LLMs (OpenAI, local models via LiteLLM)
+- Custom agent architecture
+- Simpler, more controllable workflows
+- Better understanding of the fundamentals
+
+This change will allow for:
+- Better learning experience
+- More control over the system
+- Easier debugging
+- Clearer understanding of AI agent principles
+
+
 # Mon Premier Agent
 
 ## Description

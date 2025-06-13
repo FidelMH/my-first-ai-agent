@@ -15,6 +15,7 @@ OLLAMA_DEEPSEEK_R1 = os.getenv("OLLAMA_DEEPSEEK_R1")
 LLM_API = os.getenv("LLM_API")
 GOOGLE_CSE_ID = os.getenv("GOOGLE_CSE_ID")
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
+SERPER_API_KEY = os.getenv("SERPER_API_KEY")
 # ----- FIN DE LA CONFIGURATION -----
 # Vérification des variables d'environnement
 if not DISCORD_TOKEN:
@@ -44,3 +45,5 @@ if not GOOGLE_API_KEY:
     raise ConfigError(
         "La clé API Google n'est pas définie dans le fichier .env"
     )
+if not SERPER_API_KEY:
+    raise ConfigError("La clé SERPER n'est pas définie dans le fichier .env")

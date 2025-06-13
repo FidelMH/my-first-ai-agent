@@ -5,11 +5,12 @@ from config import (
     OLLAMA_QWEN3,
     OLLAMA_DEEPSEEK_R1,
     LLM_API,
+    SERPER_API_KEY
 )
 from crewai import Crew, Agent, Process, Task, LLM
-from crewai_tools import SeleniumScrapingTool
+from crewai_tools import ScrapeWebsiteTool,SerperDevTool
 
-from utils import SearchTool
+
 
 
 def create_llm(model: str, **config) -> LLM:
@@ -17,7 +18,6 @@ def create_llm(model: str, **config) -> LLM:
     default_config = {
         "messages": [],
         "temperature": 0.7,
-        "context_length": 4096,
     }
     default_config.update(config)
     return LLM(model=model, base_url=LLM_API, config=default_config)
@@ -29,8 +29,8 @@ def create_agents() -> tuple[Agent, Agent, Agent]:
     llm_qwen3 = create_llm(OLLAMA_QWEN3)
     llm_deepseek_r1 = LLM(model=OLLAMA_DEEPSEEK_R1, base_url=LLM_API)
 
-    search_tool = SearchTool()
-    scrape_tool = SeleniumScrapingTool()
+    search_tool = SerperDevTool()
+    scrape_tool = ScrapeWebsiteTool()
 
     redact_agent = Agent(
         role="Rédacteur de Synthèse",
@@ -50,38 +50,26 @@ def create_agents() -> tuple[Agent, Agent, Agent]:
     )
 
     search_agent = Agent(
-        role="Agent de Recherche",
-        goal="""Tu es un expert en recherche d'information.
-        Ta mission exacte :
-        1. Analyser la requête pour identifier les mots-clés
-        2. Rechercher des sources fiables et pertinentes
-        3. Évaluer la qualité et la crédibilité des sources
-        4. Sélectionner les 3 meilleures URLs
-        5. Fournir un contexte pour chaque source""",
+        role="Agent de Recherche sur {query}",
+        goal="""Trouver des liens web pertinents sur un thème donné pour alimenter un agent scrapper""",
         backstory=(
-            "Je suis un expert en recherche qui sait identifier les sources "
-            "les plus pertinentes"
+            "Expert en recherche internet rapide et ciblée. Ne lit pas les pages, mais identifie les sources les plus pertinentes pour le sujet demandé.: {query}.   "
+            "Tu utilises TOUJOURS l'outil Serper pour effectuer des recherches sur le web."
         ),
         llm=llm_qwen3,
-        tools=[search_tool],
+        tools=[SerperDevTool(result_as_answer=True)],
         verbose=True,
     )
 
     scrape_agent = Agent(
-        role="Agent d'Extraction Web",
-        goal="""Tu es un agent spécialisé dans l'extraction de contenu web.
-        Ta mission est d'analyser les URLs fournies et d'en extraire les
-        informations pertinentes.
-        Pour chaque page web :
-        1. Extraire le contenu principal
-        2. Identifier les dates, titres et informations clés
-        3. Ignorer les publicités et contenus non pertinents
-        4. Structurer les informations extraites de manière claire
-        5. Vérifier la pertinence du contenu par rapport à la requête
+        role="Scrapper web",
+        goal="""Extraire proprement le contenu textuel des pages web fournies pour les transmettre à l'agent Rédacteur
         """,
-        backstory="""Je suis un expert en extraction de données web qui transforme
-        les pages web en informations structurées et exploitables.""",
-        llm=llm_deepseek_r1,
+        backstory=(
+        "Spécialiste du scraping web. Son objectif est de récupérer rapidement le texte principal de chaque URL fournie, "
+        "en nettoyant le contenu inutile comme les menus, pubs ou commentaires. Il ne fait aucune synthèse."
+    ),
+        llm=llm_qwen3,
         tools=[scrape_tool],
         verbose=True,
     )
@@ -95,47 +83,36 @@ def create_tasks(
     """Create and return tasks for the crew."""
 
     search_task = Task(
-        description="""Recherche pour : "{query}"
-
-        Exigences précises :
-        1. Maximum 3 URLs pertinentes
-        2. Sources de moins de 2 ans si possible
-        3. Éviter les sites promotionnels
-        4. Format de retour strict et obligatoire:
-        {
-            "task_status": "completed",
-            "urls": ["url1", "url2", "url3"],
-            "contexte": {
-                "url1": "description et pertinence",
-                "url2": "description et pertinence",
-                "url3": "description et pertinence"
-            }
-        }""",
+        description=(
+        "Fais une recherche web sur le thème suivant : '{query}'. "
+        "Identifie les 5 à 10 liens les plus pertinents (articles, rapports, études, actualités), "
+        "et retourne-les sous forme de liste avec le titre et l'URL. "
+        "Ne lis pas les pages. N'analyse pas leur contenu. Ne fais pas de résumé."
+    ),
         agent=search_agent,
-        expected_output="Dict avec urls et contexte",
+        expected_output=(
+        "Une liste des liens pertinents au format Markdown ou JSON :\n"
+        "- [Titre de l'article 1](https://...)\n"
+        "- [Titre de l'article 2](https://...)\n"
+        "..." 
+        ),
+        output_file="results/links_output.txt"
     )
 
     scrape_task = Task(
-        description="""Analyse et extrait le contenu de la recherche précédente.
-
-        Instructions :
-        1. Utilise l'outil de scraping pour chaque URL trouvée
-        2. Extrait uniquement le contenu pertinent
-        3. Structure les informations par source
-        4. Fournis un résumé pour chaque page
-        5. Indique la date de publication si disponible
-
-        Format de retour obligatoire:
-        {
-            "task_status": "completed",
-            "content": {
-                "url1": {"summary": "...", "date": "..."},
-                "url2": {"summary": "...", "date": "..."},
-                "url3": {"summary": "...", "date": "..."}
-            }
-        }""",
+        description=(
+        "À partir de la liste suivante d'URLs : {query}, récupère le contenu principal de chaque page web. "
+        "Ignore les menus, pubs, sidebars, commentaires ou balises inutiles. "
+        "Rends un texte brut clair pour chaque page, structuré si possible par titre ou section."
+    ),
         agent=scrape_agent,
-        expected_output="Dict avec contenu structuré par source",
+        expected_output=(
+        "Un dictionnaire ou JSON contenant pour chaque URL : son titre (si possible) et le texte brut extrait. "
+        "Exemple :\n"
+        "{\n  'https://...': {'title': 'Titre', 'content': 'Texte principal...'}, ...\n}"
+    ),
+        output_file="results/scraped_contents.json",
+        context=[search_task]
     )
 
     redact_task = Task(
@@ -178,7 +155,8 @@ def create_tasks(
         8. ne pas inclure les penssées du modele, juste l'article final.""",
         agent=redact_agent,
         expected_output="Article en Markdown",
-        output_file="article.md",
+        context=[scrape_task],
+        output_file="results/final_article.txt",
     )
 
     return search_task, scrape_task, redact_task
