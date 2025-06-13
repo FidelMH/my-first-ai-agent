@@ -1,10 +1,10 @@
 from crewai.tools import BaseTool
 from crewai_tools import SeleniumScrapingTool
 from langchain_google_community import GoogleSearchAPIWrapper
-from config import GOOGLE_CSE_ID, GOOGLE_API_KEY
 from logging_config import logger
 from urllib.parse import urlparse
 from typing import Optional
+import requests
 
 from validators import validate_search_results, validate_scrape_content
 
@@ -19,6 +19,7 @@ class SearchTool(BaseTool):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        from config import GOOGLE_CSE_ID, GOOGLE_API_KEY
         self.search = GoogleSearchAPIWrapper(
             google_cse_id=GOOGLE_CSE_ID,
             google_api_key=GOOGLE_API_KEY,
@@ -32,6 +33,14 @@ class SearchTool(BaseTool):
                 parsed.scheme in ["http", "https"] and len(parsed.netloc) > 3
             )
 
+        except Exception:
+            return False
+
+    def is_reachable(self, url: str) -> bool:
+        """Check if the URL responds with a successful status."""
+        try:
+            response = requests.head(url, allow_redirects=True, timeout=5)
+            return response.status_code < 400
         except Exception:
             return False
 
@@ -51,8 +60,8 @@ class SearchTool(BaseTool):
                 snippet = result.get("snippet", "").strip()
                 link = result.get("link", "").strip()
 
-                if self.validate_url(link):
-                    filtered.append({"title": title, "description": snippet, "url": link})
+                if self.validate_url(link) and self.is_reachable(link):
+                    filtered.append({"title": title, "snippet": snippet, "link": link})
 
             valid_results = validate_search_results(filtered)
 
